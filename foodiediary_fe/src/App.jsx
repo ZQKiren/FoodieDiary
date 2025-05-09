@@ -1,4 +1,3 @@
-// Updated App.jsx with AdminLayout
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -7,18 +6,15 @@ import AdminRoute from './components/common/AdminRoute';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 
-// Auth Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
 
-// User Pages
 import Home from './pages/Home';
 import MyPosts from './pages/MyPosts';
 import NewPost from './pages/NewPost';
 import EditPost from './pages/EditPost';
 import ViewPost from './pages/ViewPost';
 
-// Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import PostsManagement from './pages/admin/PostsManagement';
 import UsersManagement from './pages/admin/UsersManagement';

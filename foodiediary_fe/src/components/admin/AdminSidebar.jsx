@@ -1,4 +1,3 @@
-// src/components/admin/AdminSidebar.jsx
 import { NavLink, useLocation } from 'react-router-dom';
 
 const AdminSidebar = () => {
@@ -122,7 +121,7 @@ const AdminSidebar = () => {
                 ? 'bg-green-100 text-green-700'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
-            end={link.path === '/admin'} // Exact match only for dashboard
+            end={link.path === '/admin'}
           >
             <span className="mr-3">{link.icon}</span>
             {link.name}

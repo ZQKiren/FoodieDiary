@@ -1,4 +1,3 @@
-// src/components/posts/PostForm.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../context/ToastContext';
@@ -21,7 +20,6 @@ const PostForm = ({ post = null, isEditing = false }) => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    // If editing, populate form with post data
     if (isEditing && post) {
       setFormData({
         title: post.title,

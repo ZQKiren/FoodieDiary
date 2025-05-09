@@ -1,4 +1,3 @@
-// src/components/admin/PostApproval.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -19,38 +18,30 @@ const PostApproval = () => {
   const location = useLocation();
   const [selectedPost, setSelectedPost] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // New state to track if URL parameters have been processed
   const [urlParamsProcessed, setUrlParamsProcessed] = useState(false);
 
-  // Reset page when filters change
   useEffect(() => {
     setPage(1);
   }, [search, minRating, approvalFilter]);
 
-  // Enhanced URL parameter processing effect
   useEffect(() => {
     console.log('URL changed:', location.search);
     const params = new URLSearchParams(location.search);
     const approvedParam = params.get('approved');
 
-    // Convert parameter to consistent format
     const newFilter = approvedParam === 'true' ? 'true' :
       approvedParam === 'false' ? 'false' : '';
     
     console.log('Processing URL params: current filter=', approvalFilter, 'new filter=', newFilter);
     
-    // Only update if different to prevent infinite loops
     if (newFilter !== approvalFilter) {
       setApprovalFilter(newFilter);
     }
     
-    // Mark URL parameters as processed
     setUrlParamsProcessed(true);
   }, [location.search]);
 
-  // Only fetch posts after URL parameters are processed
   useEffect(() => {
-    // Skip initial fetch before URL params are processed
     if (!urlParamsProcessed) {
       console.log('Skipping fetch - URL params not processed yet');
       return;
@@ -60,17 +51,16 @@ const PostApproval = () => {
     fetchPosts();
   }, [page, search, minRating, approvalFilter, urlParamsProcessed]);
 
-  // Fetch posts based on filters
+  
   const fetchPosts = async () => {
-    if (loading && posts.length > 0) return; // Prevent duplicate calls during transitions
+    if (loading && posts.length > 0) return; 
 
     setLoading(true);
     try {
-      // Convert approvalFilter to boolean or undefined
+      
       let approved;
       if (approvalFilter === 'true') approved = true;
       else if (approvalFilter === 'false') approved = false;
-      
       console.log('API call with approval filter:', approved);
 
       const response = await adminService.getAllPosts(
@@ -82,7 +72,6 @@ const PostApproval = () => {
       );
       
       console.log(`Fetched ${response.posts.length} posts`);
-      // Debug log to check post approval status
       console.log('Posts approval statuses:', response.posts.map(p => 
         ({id: p.id, title: p.title, approved: p.isApproved})
       ));
@@ -97,7 +86,6 @@ const PostApproval = () => {
     }
   };
 
-  // Handle post approval toggle
   const handleApprovalToggle = async (id, currentStatus) => {
     try {
       await adminService.updatePostStatus(id, !currentStatus);
@@ -105,29 +93,25 @@ const PostApproval = () => {
         `Post ${!currentStatus ? 'approved' : 'hidden'} successfully`,
         'success'
       );
-      fetchPosts(); // Refresh the list
+      fetchPosts(); 
     } catch (error) {
       console.error('Error updating post status:', error);
       showToast('Failed to update post status', 'error');
     }
   };
 
-  // Handle search form submission
   const handleSearch = (e) => {
     e.preventDefault();
     setSearch(searchTerm);
   };
 
-  // Handle rating filter change
   const handleRatingFilter = (e) => {
     setMinRating(parseInt(e.target.value));
   };
 
-  // Handle approval filter change
   const handleApprovalFilter = (e) => {
     const value = e.target.value;
 
-    // Update URL for bookmarking/sharing without page reload
     const params = new URLSearchParams(location.search);
     if (value) {
       params.set('approved', value);
@@ -138,7 +122,6 @@ const PostApproval = () => {
     navigate({ pathname: location.pathname, search: params.toString() }, { replace: true });
   };
 
-  // Determine page title and description based on filter
   const getPageInfo = () => {
     if (approvalFilter === 'false') {
       return {
@@ -158,7 +141,6 @@ const PostApproval = () => {
     }
   };
 
-  // Modal functions - add these before the renderStars function
   const openPostDetail = (post) => {
     setSelectedPost(post);
     setIsModalOpen(true);
@@ -176,13 +158,11 @@ const PostApproval = () => {
     }
   };
 
-  // Helper function to truncate text to a specific length
   const truncateText = (text, maxLength = 20) => {
     if (!text) return "";
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
-  // Render stars for rating
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -202,7 +182,6 @@ const PostApproval = () => {
     return <div className="flex">{stars}</div>;
   };
 
-  // Get page title and description
   const pageInfo = getPageInfo();
 
   return (
@@ -528,7 +507,6 @@ const PostApproval = () => {
 
                     {/* Show at most 5 pages for cleaner UI */}
                     {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                      // Calculate which pages to show
                       let pageNum;
                       if (totalPages <= 5) {
                         pageNum = i + 1;

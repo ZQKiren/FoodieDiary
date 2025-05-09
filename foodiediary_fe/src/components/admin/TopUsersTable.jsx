@@ -1,4 +1,4 @@
-// src/components/admin/TopUsersTable.jsx
+
 import { Link } from 'react-router-dom';
 
 const TopUsersTable = ({ users }) => {

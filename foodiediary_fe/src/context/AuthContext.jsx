@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
@@ -13,14 +12,11 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if token exists and is valid
     const checkAuth = async () => {
       if (token) {
         try {
-          // Decode token to get user info
           const decoded = jwtDecode(token);
           
-          // Check if token is expired
           if (decoded.exp * 1000 < Date.now()) {
             logout();
           } else {
@@ -42,7 +38,6 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [token]);
 
-  // Store token in localStorage whenever it changes
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);

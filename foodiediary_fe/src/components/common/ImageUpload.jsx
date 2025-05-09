@@ -1,4 +1,3 @@
-// src/components/common/ImageUpload.jsx
 import { useState, useRef } from 'react';
 
 const ImageUpload = ({ onChange, currentImage }) => {

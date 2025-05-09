@@ -1,4 +1,3 @@
-// src/pages/NewPost.jsx
 import PostForm from '../components/posts/PostForm';
 
 const NewPost = () => {

@@ -1,14 +1,12 @@
-// src/components/admin/charts/MonthlyPostsChart.jsx
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const MonthlyPostsChart = ({ data }) => {
-  // Map month numbers to names
+  
   const monthNames = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ];
 
-  // Format the data
   const formattedData = data.map(item => ({
     month: monthNames[item.month - 1],
     count: item.count,

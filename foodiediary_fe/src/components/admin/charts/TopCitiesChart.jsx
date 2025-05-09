@@ -1,10 +1,8 @@
-// src/components/admin/charts/TopCitiesChart.jsx
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 const TopCitiesChart = ({ data }) => {
   const COLORS = ['#22c55e', '#16a34a', '#15803d', '#166534', '#14532d', '#4ade80', '#86efac', '#bbf7d0'];
 
-  // Format data
   const formattedData = data.map(item => ({
     name: item.city.trim(),
     value: item.count,

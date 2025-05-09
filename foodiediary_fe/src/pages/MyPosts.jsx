@@ -1,4 +1,3 @@
-// src/pages/MyPosts.jsx
 import PostList from '../components/posts/PostList';
 
 const MyPosts = () => {

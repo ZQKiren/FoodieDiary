@@ -1,4 +1,3 @@
-// src/components/layout/Navbar.jsx
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';

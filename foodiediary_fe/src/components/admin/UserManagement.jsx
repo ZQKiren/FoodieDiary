@@ -1,4 +1,3 @@
-// src/components/admin/UserManagement.jsx
 import { useState, useEffect } from 'react';
 import adminService from '../../services/admin';
 import { useToast } from '../../context/ToastContext';
@@ -12,7 +11,6 @@ const UserManagement = () => {
   const { showToast } = useToast();
   const { user: currentUser } = useAuth();
 
-  // Fetch all users
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -30,19 +28,17 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Handle role change
   const handleRoleChange = async (userId, newRole) => {
     try {
       await adminService.updateUserRole(userId, newRole);
       showToast('User role updated successfully', 'success');
-      fetchUsers(); // Refresh the list
+      fetchUsers(); 
     } catch (error) {
       console.error('Error updating user role:', error);
       showToast('Failed to update user role', 'error');
     }
   };
 
-  // Handle user deletion
   const handleDeleteClick = (user) => {
     setUserToDelete(user);
     setShowDeleteModal(true);
@@ -53,7 +49,7 @@ const UserManagement = () => {
       await adminService.deleteUser(userToDelete.id);
       showToast('User deleted successfully', 'success');
       setShowDeleteModal(false);
-      fetchUsers(); // Refresh the list
+      fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
       showToast('Failed to delete user', 'error');
@@ -141,7 +137,7 @@ const UserManagement = () => {
                       onChange={(e) =>
                         handleRoleChange(user.id, e.target.value)
                       }
-                      disabled={user.id === currentUser.id} // Prevent changing own role
+                      disabled={user.id === currentUser.id} 
                       className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="user">User</option>
@@ -151,7 +147,7 @@ const UserManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleDeleteClick(user)}
-                      disabled={user.id === currentUser.id} // Prevent deleting own account
+                      disabled={user.id === currentUser.id} 
                       className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Delete

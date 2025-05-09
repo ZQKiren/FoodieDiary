@@ -1,4 +1,3 @@
-// src/components/admin/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import adminService from '../../services/admin';

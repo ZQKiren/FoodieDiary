@@ -1,4 +1,3 @@
-// src/components/posts/PostList.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PostCard from './PostCard';
