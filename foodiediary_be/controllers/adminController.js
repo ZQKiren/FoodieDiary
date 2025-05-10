@@ -114,7 +114,6 @@ exports.getCityStats = async (req, res) => {
       LIMIT 10
     `;
     
-    // Chuyển đổi giá trị BigInt thành Number
     const formattedStats = cityStats.map(stat => ({
       city: stat.city.trim(),
       count: Number(stat.count)

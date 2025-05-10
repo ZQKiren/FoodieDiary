@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 import postService from '../services/posts';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import BookmarkButton from '../components/common/BookmarkButton';
+import ShareButton from '../components/common/ShareButton';
 
 const ViewPost = () => {
   const { id } = useParams();
@@ -150,47 +152,25 @@ const ViewPost = () => {
         )}
 
         <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
             <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
-            <div className="flex space-x-2">
+            
+            {/* Action Buttons - Redesigned */}
+            <div className="flex flex-wrap gap-2">
+              <ShareButton postId={post.id} />
+              <BookmarkButton postId={post.id} />
+              
               <Link
                 to={`/edit-post/${post.id}`}
-                className="inline-flex items-center px-3 py-1 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                className="flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-gray-600 hover:text-gray-700 border border-gray-100 hover:border-gray-200"
               >
-                <svg
-                  className="mr-2 h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  />
-                </svg>
                 Edit
               </Link>
+              
               <button
                 onClick={handleDelete}
-                className="inline-flex items-center px-3 py-1 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                className="flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-red-600 hover:text-red-700 border border-red-100 hover:border-red-200"
               >
-                <svg
-                  className="mr-2 h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
                 Delete
               </button>
             </div>

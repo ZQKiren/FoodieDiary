@@ -41,6 +41,14 @@ const Navbar = () => {
                       Admin
                     </Link>
                   )}
+                  {user && (
+                    <Link
+                      to="/bookmarks"
+                      className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                    >
+                      My Bookmarks
+                    </Link>
+                  )}
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
@@ -94,6 +102,14 @@ const Navbar = () => {
                             </Menu.Item>
                           )}
                           <Menu.Item>
+                            <Link
+                              to="/bookmarks"
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            >
+                              My Bookmarks
+                            </Link>
+                          </Menu.Item>
+                          <Menu.Item>
                             <button
                               onClick={logout}
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -122,7 +138,7 @@ const Navbar = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Mobile menu button */}
               <div className="flex items-center sm:hidden">
                 <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500">
@@ -179,7 +195,7 @@ const Navbar = () => {
                 </Disclosure.Button>
               )}
             </div>
-            
+
             {user ? (
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="flex items-center px-4">

@@ -53,6 +53,13 @@ const postService = {
     const response = await axiosInstance.delete(`/posts/${id}`);
     return response.data;
   },
+
+  getSharedPost: async (id) => {
+    const response = await axiosInstance.get(`/posts/shared/${id}`);
+    return response.data;
+  },
 };
+
+
 
 export default postService;

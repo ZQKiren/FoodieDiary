@@ -1,7 +1,10 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import BookmarkButton from '../common/BookmarkButton';
+import ShareButton from '../common/ShareButton';
 
-const PostCard = ({ post, onDelete }) => {
+const PostCard = ({ post, onDelete, isBookmarkView = false }) => {
   const renderStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -72,27 +75,32 @@ const PostCard = ({ post, onDelete }) => {
         <p className="text-sm text-gray-700 mb-4 line-clamp-3">
           {post.review}
         </p>
-        <div className="flex justify-between items-center">
+        
+        {/* Action Buttons - Redesigned */}
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             to={`/posts/${post.id}`}
-            className="text-sm font-medium text-green-600 hover:text-green-700"
+            className="flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-green-600 hover:text-green-700 border border-green-100 hover:border-green-200"
           >
             View Details
           </Link>
-          <div className="flex space-x-2">
-            <Link
-              to={`/edit-post/${post.id}`}
-              className="text-sm font-medium text-gray-600 hover:text-gray-800"
-            >
-              Edit
-            </Link>
-            <button
-              onClick={() => onDelete(post.id)}
-              className="text-sm font-medium text-red-600 hover:text-red-800"
-            >
-              Delete
-            </button>
-          </div>
+          
+          <ShareButton postId={post.id} />
+          <BookmarkButton postId={post.id} />
+          
+          <Link
+            to={`/edit-post/${post.id}`}
+            className="flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-gray-600 hover:text-gray-700 border border-gray-100 hover:border-gray-200"
+          >
+            Edit
+          </Link>
+          
+          <button
+            onClick={() => onDelete(post.id)}
+            className="flex items-center px-3 py-1.5 rounded-md text-sm font-medium text-red-600 hover:text-red-700 border border-red-100 hover:border-red-200"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>

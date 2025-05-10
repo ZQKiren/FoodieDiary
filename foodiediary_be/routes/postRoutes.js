@@ -10,5 +10,6 @@ router.get('/', protect, postController.getUserPosts);
 router.get('/:id', protect, postController.getPost);
 router.put('/:id', protect, upload.single('image'), postController.updatePost);
 router.delete('/:id', protect, postController.deletePost);
+router.get('/shared/:id', postController.getSharedPost);
 
 module.exports = router;

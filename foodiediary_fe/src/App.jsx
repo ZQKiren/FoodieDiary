@@ -14,6 +14,8 @@ import MyPosts from './pages/MyPosts';
 import NewPost from './pages/NewPost';
 import EditPost from './pages/EditPost';
 import ViewPost from './pages/ViewPost';
+import Bookmarks from './pages/Bookmarks';
+import SharedPost from './pages/SharedPost';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import PostsManagement from './pages/admin/PostsManagement';
@@ -38,6 +40,8 @@ function App() {
                 <Route path="/new-post" element={<NewPost />} />
                 <Route path="/edit-post/:id" element={<EditPost />} />
                 <Route path="/posts/:id" element={<ViewPost />} />
+                <Route path="/bookmarks" element={<Bookmarks />} />
+                <Route path="/shared/:id" element={<SharedPost />} />
               </Route>
               
               {/* Admin routes */}
