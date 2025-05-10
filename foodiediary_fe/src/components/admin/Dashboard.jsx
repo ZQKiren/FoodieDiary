@@ -66,7 +66,7 @@ const Dashboard = () => {
               View All Posts
             </Link>
           </div>
-          <div className="h-64">
+          <div className="h-80"> {/* Height increased for amCharts */}
             <MonthlyPostsChart data={monthlyStats} />
           </div>
         </div>
@@ -76,12 +76,13 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-medium text-gray-900">Top Cities</h2>
           </div>
-          <div className="h-64">
+          <div className="h-80"> {/* Height increased for amCharts */}
             <TopCitiesChart data={cityStats} />
           </div>
         </div>
       </div>
 
+      {/* Rest of the component stays the same */}
       {/* Active users */}
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex justify-between items-center mb-4">
