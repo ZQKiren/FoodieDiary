@@ -1,8 +1,6 @@
-// test/controllers/adminController.test.js
 const { PrismaClient } = require('@prisma/client');
 const adminController = require('../../controllers/adminController');
 
-// Mock dependencies
 jest.mock('@prisma/client', () => {
   const mockPrisma = {
     post: {

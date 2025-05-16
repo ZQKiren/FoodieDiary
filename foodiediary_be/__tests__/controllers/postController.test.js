@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const postController = require('../../controllers/postController');
 
-// Mock Prisma
 jest.mock('@prisma/client', () => {
   const mockPrisma = {
     post: {
@@ -19,10 +18,8 @@ jest.mock('@prisma/client', () => {
   };
 });
 
-// Mock stream module
 jest.mock('stream', () => require('../__mocks__/stream'));
 
-// Mock cloudinary
 jest.mock('../../config/cloudinary', () => {
   const mockUploadStream = (options, callback) => {
     return {
@@ -40,7 +37,6 @@ jest.mock('../../config/cloudinary', () => {
   };
 });
 
-// Mock fs
 jest.mock('fs', () => ({
   unlinkSync: jest.fn()
 }));

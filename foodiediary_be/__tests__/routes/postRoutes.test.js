@@ -1,11 +1,9 @@
-// test/routes/postRoutes.test.js
 const request = require('supertest');
 const express = require('express');
 const postRoutes = require('../../routes/postRoutes');
 const { protect } = require('../../middleware/auth');
 const postController = require('../../controllers/postController');
 
-// Mock các dependencies
 jest.mock('../../middleware/auth', () => ({
   protect: jest.fn((req, res, next) => {
     req.user = { id: 1 };
@@ -17,22 +15,28 @@ jest.mock('../../middleware/upload', () => ({
   single: jest.fn(() => (req, res, next) => next())
 }));
 
+const mockCreatePost = jest.fn((req, res) => res.json({ message: 'Post created' }));
+const mockGetUserPosts = jest.fn((req, res) => res.json({ posts: [] }));
+const mockGetPost = jest.fn((req, res) => res.json({ id: 1 }));
+const mockUpdatePost = jest.fn((req, res) => res.json({ message: 'Post updated' }));
+const mockDeletePost = jest.fn((req, res) => res.json({ message: 'Post deleted' }));
+const mockGetSharedPost = jest.fn((req, res) => res.json({ id: 1, isShared: true }));
+
 jest.mock('../../controllers/postController', () => ({
-  createPost: jest.fn((req, res) => res.json({ message: 'Post created' })),
-  getUserPosts: jest.fn((req, res) => res.json({ posts: [] })),
-  getPost: jest.fn((req, res) => res.json({ id: 1 })),
-  updatePost: jest.fn((req, res) => res.json({ message: 'Post updated' })),
-  deletePost: jest.fn((req, res) => res.json({ message: 'Post deleted' })),
-  getSharedPost: jest.fn((req, res) => res.json({ id: 1, isShared: true }))
+  createPost: (req, res) => mockCreatePost(req, res),
+  getUserPosts: (req, res) => mockGetUserPosts(req, res),
+  getPost: (req, res) => mockGetPost(req, res),
+  updatePost: (req, res) => mockUpdatePost(req, res),
+  deletePost: (req, res) => mockDeletePost(req, res),
+  getSharedPost: (req, res) => mockGetSharedPost(req, res)
 }));
 
-// Tạo app Express cho testing
 const app = express();
 app.use(express.json());
 app.use('/api/posts', postRoutes);
 
 describe('Post Routes', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
   
@@ -47,7 +51,7 @@ describe('Post Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: 'Post created' });
     expect(protect).toHaveBeenCalled();
-    expect(postController.createPost).toHaveBeenCalled();
+    expect(mockCreatePost).toHaveBeenCalled();
   });
   
   test('GET / - gets user posts', async () => {
@@ -58,7 +62,7 @@ describe('Post Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ posts: [] });
     expect(protect).toHaveBeenCalled();
-    expect(postController.getUserPosts).toHaveBeenCalled();
+    expect(mockGetUserPosts).toHaveBeenCalled();
   });
   
   test('GET /:id - gets a specific post', async () => {
@@ -68,7 +72,7 @@ describe('Post Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ id: 1 });
     expect(protect).toHaveBeenCalled();
-    expect(postController.getPost).toHaveBeenCalled();
+    expect(mockGetPost).toHaveBeenCalled();
   });
   
   test('PUT /:id - updates a post', async () => {
@@ -81,7 +85,7 @@ describe('Post Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: 'Post updated' });
     expect(protect).toHaveBeenCalled();
-    expect(postController.updatePost).toHaveBeenCalled();
+    expect(mockUpdatePost).toHaveBeenCalled();
   });
   
   test('DELETE /:id - deletes a post', async () => {
@@ -91,7 +95,15 @@ describe('Post Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ message: 'Post deleted' });
     expect(protect).toHaveBeenCalled();
-    expect(postController.deletePost).toHaveBeenCalled();
+    expect(mockDeletePost).toHaveBeenCalled();
   });
-
+  
+  test('GET /shared/:id - gets a shared post', async () => {
+    const response = await request(app)
+      .get('/api/posts/shared/1');
+    
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ id: 1, isShared: true });
+    expect(mockGetSharedPost).toHaveBeenCalled();
+  });
 });

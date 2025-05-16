@@ -32,7 +32,7 @@ const UserManagement = () => {
     try {
       await adminService.updateUserRole(userId, newRole);
       showToast('User role updated successfully', 'success');
-      fetchUsers(); 
+      fetchUsers();
     } catch (error) {
       console.error('Error updating user role:', error);
       showToast('Failed to update user role', 'error');
@@ -137,7 +137,7 @@ const UserManagement = () => {
                       onChange={(e) =>
                         handleRoleChange(user.id, e.target.value)
                       }
-                      disabled={user.id === currentUser.id} 
+                      disabled={user.id === currentUser.id}
                       className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     >
                       <option value="user">User</option>
@@ -147,7 +147,7 @@ const UserManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => handleDeleteClick(user)}
-                      disabled={user.id === currentUser.id} 
+                      disabled={user.id === currentUser.id}
                       className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Delete
@@ -222,6 +222,7 @@ const UserManagement = () => {
                 <button
                   type="button"
                   onClick={confirmDelete}
+                  data-testid="confirm-delete-button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                 >
                   Delete

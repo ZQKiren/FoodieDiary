@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Home from '../Home';
 
-// Mock AuthContext
 vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn()
 }));
@@ -15,12 +14,10 @@ vi.mock('../../context/ToastContext', () => ({
   })
 }));
 
-// Import after mocking
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 describe('Home Page', () => {
-  // Setup function to render with different auth states
   const renderHome = (isAuthenticated = false) => {
     useAuth.mockReturnValue({
       user: isAuthenticated ? { id: 1, name: 'Test User' } : null

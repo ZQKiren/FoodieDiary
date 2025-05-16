@@ -4,11 +4,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import EditPost from '../EditPost';
 
-// Create navigate mock before any mocking
 const navigateMock = vi.fn();
 const showToastMock = vi.fn();
 
-// Mock the router hooks
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -18,7 +16,6 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock the post service
 vi.mock('../../services/posts', () => ({
   default: {
     getPost: vi.fn(),
@@ -26,7 +23,6 @@ vi.mock('../../services/posts', () => ({
   }
 }));
 
-// Mock the PostForm component
 vi.mock('../../components/posts/PostForm', () => ({
   default: vi.fn(({ post, isEditing }) => (
     <div data-testid="post-form">
@@ -36,14 +32,12 @@ vi.mock('../../components/posts/PostForm', () => ({
   ))
 }));
 
-// Mock the context providers - use the already defined showToastMock
 vi.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: showToastMock
   })
 }));
 
-// Import after mocking
 import postService from '../../services/posts';
 import { useToast } from '../../context/ToastContext';
 
@@ -60,12 +54,10 @@ describe('EditPost Page', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Default mock for successful post fetch
     postService.getPost.mockResolvedValue(mockPost);
   });
 
   it('shows loading state initially', async () => {
-    // Make getPost delay to test loading state
     postService.getPost.mockImplementation(() => 
       new Promise(resolve => setTimeout(() => resolve(mockPost), 100))
     );
@@ -76,10 +68,8 @@ describe('EditPost Page', () => {
       </BrowserRouter>
     );
 
-    // Should show loading spinner initially
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
 
-    // Wait for post to load
     await waitFor(() => {
       expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument();
     });
@@ -92,7 +82,6 @@ describe('EditPost Page', () => {
       </BrowserRouter>
     );
 
-    // Wait for post to load and check PostForm was called with correct props
     await waitFor(() => {
       expect(postService.getPost).toHaveBeenCalledWith(5);
       expect(screen.getByText('Editing: Test Post')).toBeInTheDocument();
@@ -101,7 +90,6 @@ describe('EditPost Page', () => {
   });
 
   it('handles error when fetching post fails', async () => {
-    // Setup getPost to fail
     postService.getPost.mockRejectedValue(new Error('Failed to fetch post'));
 
     render(
@@ -110,7 +98,6 @@ describe('EditPost Page', () => {
       </BrowserRouter>
     );
 
-    // Wait for error handling to complete
     await waitFor(() => {
       expect(showToastMock).toHaveBeenCalledWith('Failed to load post', 'error');
       expect(navigateMock).toHaveBeenCalledWith('/my-posts');

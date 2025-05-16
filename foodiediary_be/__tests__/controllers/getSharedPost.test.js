@@ -1,13 +1,25 @@
+// __tests__/controllers/getSharedPost.test.js
 const { PrismaClient } = require('@prisma/client');
 const postController = require('../../controllers/postController');
 
-// Mock dependencies
+// More comprehensive mock of PrismaClient
 jest.mock('@prisma/client', () => {
+  // Create mock functions for all methods that might be used
   const mockFindUnique = jest.fn();
+  const mockCreate = jest.fn();
+  const mockUpdate = jest.fn();
+  const mockDelete = jest.fn();
+  const mockFindMany = jest.fn();
+  const mockCount = jest.fn();
   
   const mockPrisma = {
     post: {
-      findUnique: mockFindUnique
+      findUnique: mockFindUnique,
+      create: mockCreate,
+      update: mockUpdate,
+      delete: mockDelete,
+      findMany: mockFindMany,
+      count: mockCount
     }
   };
   
@@ -15,6 +27,9 @@ jest.mock('@prisma/client', () => {
     PrismaClient: jest.fn(() => mockPrisma)
   };
 });
+
+// Mock console.error to prevent error logs during tests
+jest.spyOn(console, 'error').mockImplementation(() => {});
 
 describe('GetSharedPost Controller', () => {
   let req;
@@ -31,6 +46,7 @@ describe('GetSharedPost Controller', () => {
       json: jest.fn()
     };
     
+    // Clear all mocks to ensure tests are isolated
     jest.clearAllMocks();
   });
   

@@ -1,4 +1,3 @@
-// src/pages/__tests__/Login.test.jsx
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -8,7 +7,6 @@ import Login from '../Login';
 
 const navigateMock = vi.fn();
 
-// Mock react-router-dom hooks
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -20,21 +18,18 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock AuthContext
 vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn().mockReturnValue({
     login: vi.fn()
   })
 }));
 
-// Mock ToastContext
 vi.mock('../../context/ToastContext', () => ({
   useToast: vi.fn().mockReturnValue({
     showToast: vi.fn()
   })
 }));
 
-// Import after mocking
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
@@ -45,7 +40,6 @@ describe('Login Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Setup mocks
     useAuth.mockReturnValue({ login: loginMock });
     useToast.mockReturnValue({ showToast: showToastMock });
   });
@@ -64,7 +58,6 @@ describe('Login Page', () => {
   });
 
   it('submits the form with correct values', async () => {
-    // Setup successful login
     loginMock.mockResolvedValue({});
     
     render(
@@ -73,17 +66,13 @@ describe('Login Page', () => {
       </BrowserRouter>
     );
     
-    // Fill form
     await userEvent.type(screen.getByLabelText('Email address'), 'test@example.com');
     await userEvent.type(screen.getByLabelText('Password'), 'password123');
     
-    // Submit form
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
     
-    // Verify login was called with correct arguments
     expect(loginMock).toHaveBeenCalledWith('test@example.com', 'password123');
     
-    // Wait for navigation after successful login
     await waitFor(() => {
       expect(showToastMock).toHaveBeenCalledWith('Login successful!', 'success');
       expect(navigateMock).toHaveBeenCalledWith('/dashboard', { replace: true });
@@ -91,7 +80,6 @@ describe('Login Page', () => {
   });
 
   it('shows error message when login fails', async () => {
-    // Setup login failure
     const errorMessage = 'Invalid credentials';
     loginMock.mockRejectedValue({
       response: { data: { message: errorMessage } }
@@ -103,25 +91,20 @@ describe('Login Page', () => {
       </BrowserRouter>
     );
     
-    // Fill form
     await userEvent.type(screen.getByLabelText('Email address'), 'test@example.com');
     await userEvent.type(screen.getByLabelText('Password'), 'wrongpassword');
     
-    // Submit form
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
     
-    // Verify error handling
     await waitFor(() => {
       expect(showToastMock).toHaveBeenCalledWith(errorMessage, 'error');
       expect(navigateMock).not.toHaveBeenCalled();
     });
     
-    // Button should no longer be in loading state
     expect(screen.getByRole('button', { name: 'Sign in' })).not.toBeDisabled();
   });
 
   it('shows loading state during login attempt', async () => {
-    // Setup delayed login response
     loginMock.mockImplementation(() => new Promise(resolve => {
       setTimeout(() => resolve({}), 100);
     }));
@@ -132,17 +115,13 @@ describe('Login Page', () => {
       </BrowserRouter>
     );
     
-    // Fill form
     await userEvent.type(screen.getByLabelText('Email address'), 'test@example.com');
     await userEvent.type(screen.getByLabelText('Password'), 'password123');
     
-    // Submit form
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
     
-    // Verify loading state
     expect(screen.getByRole('button', { name: 'Signing in...' })).toBeDisabled();
     
-    // Wait for login to complete
     await waitFor(() => {
       expect(navigateMock).toHaveBeenCalled();
     });
@@ -155,8 +134,7 @@ describe('Login Page', () => {
       </BrowserRouter>
     );
     
-    await userEvent.click(screen.getByText('Register now'));
-    
-    expect(navigateMock).toHaveBeenCalledWith('/register');
+    const linkElement = screen.getByText('Register now').closest('a');
+      expect(linkElement).toHaveAttribute('href', '/register');
   });
 });

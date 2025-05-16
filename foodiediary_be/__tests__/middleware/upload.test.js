@@ -1,23 +1,16 @@
-const multer = require('multer');
-const path = require('path');
-
-// Mock dependencies - important to do this BEFORE requiring upload
+// __tests__/middleware/upload.test.js
+// Mock dependencies before requiring the upload module
 jest.mock('multer', () => {
-  const mockSingle = jest.fn().mockReturnValue('multer middleware');
-  const mockMulter = jest.fn().mockReturnValue({
-    single: mockSingle
-  });
+  // Create a mock of the multer instance that will be returned
+  const multerInstance = {
+    single: jest.fn().mockReturnValue('multer middleware')
+  };
   
-  // Add memoryStorage method to the mockMulter function
+  // Create the main multer mock function
+  const mockMulter = jest.fn().mockReturnValue(multerInstance);
+  
+  // Add memoryStorage method
   mockMulter.memoryStorage = jest.fn().mockReturnValue('memory storage');
-  
-  // Make mock.calls available for testing
-  mockMulter.mock = { calls: [] };
-  mockMulter.mock.calls.push([{ 
-    storage: 'memory storage',
-    limits: { fileSize: 5000000 },
-    fileFilter: expect.any(Function)
-  }]);
   
   return mockMulter;
 });
@@ -27,86 +20,89 @@ jest.mock('path', () => ({
 }));
 
 describe('Upload Middleware', () => {
-  let upload;
+  let multer;
+  let path;
+  let upload; // This will be the export from your module
+  let fileFilter;
   
   beforeEach(() => {
+    // Clear all mocks
     jest.clearAllMocks();
-    
-    // Reset modules to ensure clean state
     jest.resetModules();
     
-    // We need to re-mock after resetModules
-    multer.memoryStorage.mockReturnValue('memory storage');
-    multer.mock = { calls: [] };
-    multer.mock.calls.push([{ 
-      storage: 'memory storage',
-      limits: { fileSize: 5000000 },
-      fileFilter: expect.any(Function)
-    }]);
+    // Import mocked modules
+    multer = require('multer');
+    path = require('path');
     
-    // Now require the module under test
+    // Capture the fileFilter when multer is called
+    multer.mockImplementation(options => {
+      fileFilter = options.fileFilter;
+      return multer.mock.results[0].value; // Return the multerInstance
+    });
+    
+    // Import the upload module - this will be the multer instance
     upload = require('../../middleware/upload');
   });
   
   test('configures multer with memory storage', () => {
     expect(multer.memoryStorage).toHaveBeenCalled();
-    expect(multer).toHaveBeenCalledWith(expect.objectContaining({
+    expect(multer).toHaveBeenCalledWith({
       storage: 'memory storage',
-      limits: { fileSize: 5000000 },
+      limits: { fileSize: 5000000 }, // 5MB
       fileFilter: expect.any(Function)
-    }));
+    });
   });
   
   test('upload.single returns middleware function', () => {
-    expect(upload.single('image')).toBe('multer middleware');
+    // Here upload is the multer instance with a single method
+    const middleware = upload.single('image');
+    expect(middleware).toBe('multer middleware');
   });
   
   test('fileFilter accepts valid image files', () => {
-    // Mock path.extname to return .jpg
+    // Verify fileFilter was captured
+    expect(typeof fileFilter).toBe('function');
+    
+    // Mock for path.extname
     path.extname.mockReturnValue('.jpg');
     
-    // Extract the fileFilter function - this is now manually available through our mock
-    const fileFilter = multer.mock.calls[0][0].fileFilter;
-    
-    // Create mock file and callback
-    const mockFile = {
+    // Create test data
+    const req = {};
+    const file = {
       originalname: 'test.jpg',
       mimetype: 'image/jpeg'
     };
-    const mockCallback = jest.fn();
+    const cb = jest.fn();
     
     // Call the fileFilter function
-    fileFilter({}, mockFile, mockCallback);
+    fileFilter(req, file, cb);
     
-    // Verify extname was called correctly
+    // Verify behavior
     expect(path.extname).toHaveBeenCalledWith('test.jpg');
-    
-    // Verify callback received correct arguments (null = no error, true = accept file)
-    expect(mockCallback).toHaveBeenCalledWith(null, true);
+    expect(cb).toHaveBeenCalledWith(null, true);
   });
   
   test('fileFilter rejects invalid files', () => {
-    // Mock path.extname to return .pdf
+    // Verify fileFilter was captured
+    expect(typeof fileFilter).toBe('function');
+    
+    // Mock for path.extname
     path.extname.mockReturnValue('.pdf');
     
-    // Extract the fileFilter function
-    const fileFilter = multer.mock.calls[0][0].fileFilter;
-    
-    // Create mock file and callback
-    const mockFile = {
+    // Create test data
+    const req = {};
+    const file = {
       originalname: 'test.pdf',
       mimetype: 'application/pdf'
     };
-    const mockCallback = jest.fn();
+    const cb = jest.fn();
     
     // Call the fileFilter function
-    fileFilter({}, mockFile, mockCallback);
+    fileFilter(req, file, cb);
     
-    // Verify extname was called correctly
+    // Verify behavior
     expect(path.extname).toHaveBeenCalledWith('test.pdf');
-    
-    // Verify callback received error
-    expect(mockCallback).toHaveBeenCalledWith(expect.any(Error));
-    expect(mockCallback.mock.calls[0][0].message).toBe('Only image files are allowed!');
+    expect(cb).toHaveBeenCalledWith(expect.any(Error));
+    expect(cb.mock.calls[0][0].message).toBe('Only image files are allowed!');
   });
 });

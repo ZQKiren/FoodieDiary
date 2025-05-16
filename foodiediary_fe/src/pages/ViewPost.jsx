@@ -66,12 +66,15 @@ const ViewPost = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      </div>
-    );
-  }
+  return (
+    <div className="flex justify-center items-center py-12">
+      <div 
+        data-testid="loading-spinner" 
+        className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"
+      ></div>
+    </div>
+  );
+}
 
   if (!post) {
     return (
