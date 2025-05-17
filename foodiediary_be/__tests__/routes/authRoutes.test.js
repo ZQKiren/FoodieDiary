@@ -1,16 +1,13 @@
-// test/routes/authRoutes.test.js
 const request = require('supertest');
 const express = require('express');
 const authRoutes = require('../../routes/authRoutes');
 const authController = require('../../controllers/authController');
 
-// Mock the auth controller
 jest.mock('../../controllers/authController', () => ({
   register: jest.fn((req, res) => res.json({ message: 'User registered' })),
   login: jest.fn((req, res) => res.json({ message: 'User logged in' }))
 }));
 
-// Create Express app for testing
 const app = express();
 app.use(express.json());
 app.use('/api/auth', authRoutes);

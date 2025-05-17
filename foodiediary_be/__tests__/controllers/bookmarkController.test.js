@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const bookmarkController = require('../../controllers/bookmarkController');
 
-// Mock dependencies
 jest.mock('@prisma/client', () => {
   const mockPrisma = {
     post: {

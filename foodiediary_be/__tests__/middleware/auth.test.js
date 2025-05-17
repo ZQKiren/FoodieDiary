@@ -1,9 +1,8 @@
-// test/middleware/auth.test.js
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { protect, admin } = require('../../middleware/auth');
 
-// Mock dependencies
+
 jest.mock('jsonwebtoken');
 jest.mock('@prisma/client', () => {
   const mockPrisma = {
@@ -104,7 +103,6 @@ describe('Auth Middleware', () => {
       
       await protect(req, res, next);
       
-      // test/middleware/auth.test.js (tiếp tục)
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
         message: 'User not found'
@@ -115,7 +113,6 @@ describe('Auth Middleware', () => {
   
   describe('admin middleware', () => {
     test('calls next() if user is admin', async () => {
-      // Setup admin user
       req.user = {
         id: 1,
         name: 'Admin User',
@@ -129,7 +126,6 @@ describe('Auth Middleware', () => {
     });
     
     test('returns 403 if user is not admin', async () => {
-      // Setup regular user
       req.user = {
         id: 1,
         name: 'Regular User',

@@ -1,10 +1,8 @@
-// test/controllers/authController.test.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const authController = require('../../controllers/authController');
 
-// Mock dependencies
 jest.mock('bcrypt');
 jest.mock('jsonwebtoken');
 jest.mock('@prisma/client', () => {

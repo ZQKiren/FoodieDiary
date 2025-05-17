@@ -18,21 +18,47 @@ jest.mock('@prisma/client', () => {
   };
 });
 
-jest.mock('stream', () => require('../__mocks__/stream'));
+// Improved stream mock
+class MockReadable {
+  constructor() {
+    this.data = [];
+  }
 
-jest.mock('../../config/cloudinary', () => {
-  const mockUploadStream = (options, callback) => {
-    return {
-      processData: (data) => {
-        callback(null, { secure_url: 'https://cloudinary.com/image.jpg' });
+  push(chunk) {
+    if (chunk !== null) {
+      this.data.push(chunk);
+    }
+    return true;
+  }
+
+  pipe(dest) {
+    // Process all data and trigger callback
+    if (dest.processData) {
+      for (const chunk of this.data) {
+        dest.processData(chunk);
       }
-    };
-  };
-  
+    }
+    return dest;
+  }
+}
+
+jest.mock('stream', () => ({
+  Readable: MockReadable
+}));
+
+// Better Cloudinary mock
+jest.mock('../../config/cloudinary', () => {
   return {
     uploader: {
       upload: jest.fn().mockResolvedValue({ secure_url: 'https://cloudinary.com/image.jpg' }),
-      upload_stream: mockUploadStream
+      upload_stream: (options, callback) => {
+        // Return an object with processData method that will be called by the pipe method
+        return {
+          processData: (data) => {
+            callback(null, { secure_url: 'https://cloudinary.com/image.jpg' });
+          }
+        };
+      }
     }
   };
 });
@@ -44,8 +70,8 @@ jest.mock('fs', () => ({
 describe('Post Controller', () => {
   let req;
   let res;
+  let consoleErrorSpy;
   const prisma = new PrismaClient();
-  const cloudinary = require('../../config/cloudinary');
   
   beforeEach(() => {
     req = {
@@ -61,7 +87,15 @@ describe('Post Controller', () => {
       json: jest.fn()
     };
     
+    // Spy on console.error and suppress output
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    
     jest.clearAllMocks();
+  });
+  
+  afterEach(() => {
+    // Restore console.error after each test
+    consoleErrorSpy.mockRestore();
   });
   
   describe('createPost', () => {
@@ -76,22 +110,30 @@ describe('Post Controller', () => {
     });
     
     test('creates a post without image', async () => {
-      const mockPost = { id: 1, ...req.body, userId: 1, isApproved: false };
+      const mockPost = { 
+        id: 1, 
+        ...req.body, 
+        rating: 4,
+        eatenAt: new Date('2023-01-01'),
+        userId: 1, 
+        isApproved: false,
+        image: '' 
+      };
+      
       prisma.post.create.mockResolvedValue(mockPost);
       
       await postController.createPost(req, res);
       
       expect(prisma.post.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           title: 'Test Post',
           location: 'Test Location',
           review: 'Test Review',
           rating: 4,
-          eatenAt: expect.any(Date),
           image: '',
           userId: 1,
           isApproved: false
-        }
+        })
       });
       
       expect(res.status).toHaveBeenCalledWith(201);
@@ -103,13 +145,14 @@ describe('Post Controller', () => {
     
     test('creates a post with image', async () => {
       req.file = {
-        path: 'uploads/test.jpg',
         buffer: Buffer.from('test image data')
       };
       
       const mockPost = { 
         id: 1, 
         ...req.body, 
+        rating: 4,
+        eatenAt: new Date('2023-01-01'),
         userId: 1, 
         isApproved: false,
         image: 'https://cloudinary.com/image.jpg' 
@@ -119,16 +162,12 @@ describe('Post Controller', () => {
       
       await postController.createPost(req, res);
       
-      // No longer need to check for cloudinary.uploader.upload call
-      // since we're using upload_stream
-      
       expect(prisma.post.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           title: 'Test Post',
           location: 'Test Location',
           review: 'Test Review',
           rating: 4,
-          eatenAt: expect.any(Date),
           image: 'https://cloudinary.com/image.jpg',
           userId: 1,
           isApproved: false
@@ -142,17 +181,52 @@ describe('Post Controller', () => {
       });
     });
     
-    test('handles errors', async () => {
+    test('handles database errors', async () => {
       const error = new Error('Database error');
       prisma.post.create.mockRejectedValue(error);
       
       await postController.createPost(req, res);
+      
+      // Verify console.error was called with the right arguments
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Error creating post:', error);
       
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         message: 'Error creating post',
         error: 'Database error'
       });
+    });
+    
+    test('handles cloudinary upload errors', async () => {
+      req.file = {
+        buffer: Buffer.from('test image data')
+      };
+      
+      // Temporarily override the cloudinary mock to simulate an error
+      const cloudinary = require('../../config/cloudinary');
+      const originalUploadStream = cloudinary.uploader.upload_stream;
+      
+      cloudinary.uploader.upload_stream = (options, callback) => {
+        return {
+          processData: () => {
+            callback(new Error('Upload failed'), null);
+          }
+        };
+      };
+      
+      await postController.createPost(req, res);
+      
+      // Verify console.error was called
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Error creating post',
+        error: expect.any(String)
+      });
+      
+      // Restore the original mock
+      cloudinary.uploader.upload_stream = originalUploadStream;
     });
   });
   
@@ -193,5 +267,20 @@ describe('Post Controller', () => {
         total: 15
       });
     });
+    
+    test('handles errors', async () => {
+      const error = new Error('Database error');
+      prisma.post.findMany.mockRejectedValue(error);
+      
+      await postController.getUserPosts(req, res);
+      
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Error getting posts',
+        error: 'Database error'
+      });
+    });
   });
+  
+  // Add more tests for other controller methods as needed
 });

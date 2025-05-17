@@ -1,11 +1,9 @@
-// test/routes/bookmarkRoutes.test.js
 const request = require('supertest');
 const express = require('express');
 const bookmarkRoutes = require('../../routes/bookmarkRoutes');
 const { protect } = require('../../middleware/auth');
 const bookmarkController = require('../../controllers/bookmarkController');
 
-// Mock dependencies
 jest.mock('../../middleware/auth', () => ({
   protect: jest.fn((req, res, next) => {
     req.user = { id: 1 };
@@ -19,7 +17,6 @@ jest.mock('../../controllers/bookmarkController', () => ({
   checkBookmark: jest.fn((req, res) => res.json({ isBookmarked: true }))
 }));
 
-// Create Express app for testing
 const app = express();
 app.use(express.json());
 app.use('/api/bookmarks', bookmarkRoutes);
