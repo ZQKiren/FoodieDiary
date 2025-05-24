@@ -216,7 +216,7 @@ const Register = () => {
                 
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute top-2 right-0 pr-3 flex items-center"
                   onClick={() => togglePasswordVisibility('password')}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >

@@ -19,7 +19,7 @@ const PostList = () => {
     try {
       const response = await postService.getUserPosts(
         page,
-        10,
+        9,
         search,
         minRating
       );
@@ -65,12 +65,12 @@ const PostList = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">My Food Diary</h1>
-        <Link
+        {/* <Link
           to="/new-post"
           className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-md"
         >
           Add New Post
-        </Link>
+        </Link> */}
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">

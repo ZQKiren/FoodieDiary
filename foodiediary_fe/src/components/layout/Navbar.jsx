@@ -54,12 +54,12 @@ const Navbar = () => {
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
                 {user ? (
                   <div className="flex items-center">
-                    <Link
+                    {/* <Link
                       to="/new-post"
                       className="bg-green-600 hover:bg-green-700 text-white rounded-md px-3 py-2 text-sm font-medium mr-3"
                     >
                       + New Post
-                    </Link>
+                    </Link> */}
                     <Menu as="div" className="ml-3 relative">
                       <Menu.Button className="bg-white flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                         <span className="sr-only">Open user menu</span>
