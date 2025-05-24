@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import bookmarkService from '../services/bookmarks';
 import { useToast } from '../context/ToastContext';
-import PostCard from '../components/posts/PostCard';
+import BookmarkCard from '../components/common/BookmarkCard';
 
 const Bookmarks = () => {
   const [bookmarks, setBookmarks] = useState([]);
@@ -43,7 +43,12 @@ const Bookmarks = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Bookmarks</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Bookmarks</h1>
+          <p className="text-gray-600 mt-1">
+            Food posts you've saved for later reference
+          </p>
+        </div>
       </div>
 
       {loading ? (
@@ -51,12 +56,29 @@ const Bookmarks = () => {
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
         </div>
       ) : bookmarks.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-6 text-center">
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <div className="h-16 w-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="h-8 w-8"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+              />
+            </svg>
+          </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             No bookmarks found
           </h3>
-          <p className="text-gray-600 mb-4">
-            You haven't bookmarked any food posts yet.
+          <p className="text-gray-600 mb-6">
+            You haven't bookmarked any food posts yet. Start exploring and save 
+            posts that catch your interest!
           </p>
           <Link
             to="/"
@@ -73,7 +95,7 @@ const Bookmarks = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
             Discover food posts
@@ -83,16 +105,14 @@ const Bookmarks = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             {bookmarks.map((post) => (
-              <PostCard
+              <BookmarkCard
                 key={post.id}
                 post={post}
                 onBookmarkRemove={() => handleRemoveBookmark(post.id)}
-                isBookmarkView={true}
               />
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <nav className="flex items-center space-x-2">

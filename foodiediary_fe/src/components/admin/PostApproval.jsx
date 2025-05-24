@@ -9,6 +9,7 @@ const PostApproval = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
   const [search, setSearch] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [minRating, setMinRating] = useState(0);
@@ -78,6 +79,7 @@ const PostApproval = () => {
       
       setPosts(response.posts);
       setTotalPages(response.totalPages);
+      setTotalPosts(response.totalPosts || response.total || 0); 
     } catch (error) {
       console.error('Error fetching posts:', error);
       showToast('Failed to load posts', 'error');
@@ -185,7 +187,7 @@ const PostApproval = () => {
   const pageInfo = getPageInfo();
 
   return (
-    <div className="min-h-[600px]"> {/* Minimum height prevents layout shifts */}
+    <div className="min-h-[600px]">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">{pageInfo.title}</h1>
         <p className="text-gray-600">
@@ -193,10 +195,8 @@ const PostApproval = () => {
         </p>
       </div>
 
-      {/* Filters - Fixed height to prevent layout shifts */}
-      <div className="bg-white p-4 rounded-lg shadow-sm mb-6 h-[120px]">
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Search */}
           <form onSubmit={handleSearch}>
             <div className="relative">
               <input
@@ -204,7 +204,7 @@ const PostApproval = () => {
                 placeholder="Search by title or location"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg
@@ -224,23 +224,22 @@ const PostApproval = () => {
               </div>
               <button
                 type="submit"
-                className="absolute inset-y-0 right-0 px-4 text-gray-600 hover:text-gray-900"
+                className="absolute inset-y-0 right-0 px-4 text-gray-600 hover:text-gray-900 text-sm"
               >
                 Search
               </button>
             </div>
           </form>
 
-          {/* Rating filter */}
           <div className="flex items-center space-x-2">
-            <label htmlFor="rating" className="text-sm text-gray-700">
+            <label htmlFor="rating" className="text-sm text-gray-700 whitespace-nowrap">
               Rating:
             </label>
             <select
               id="rating"
               value={minRating}
               onChange={handleRatingFilter}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 flex-grow"
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 flex-grow text-sm"
             >
               <option value="0">All Ratings</option>
               <option value="1">★ and above</option>
@@ -251,16 +250,15 @@ const PostApproval = () => {
             </select>
           </div>
 
-          {/* Approval filter */}
           <div className="flex items-center space-x-2">
-            <label htmlFor="approval" className="text-sm text-gray-700">
+            <label htmlFor="approval" className="text-sm text-gray-700 whitespace-nowrap">
               Status:
             </label>
             <select
               id="approval"
               value={approvalFilter}
               onChange={handleApprovalFilter}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 flex-grow"
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 flex-grow text-sm"
             >
               <option value="">All</option>
               <option value="true">Approved</option>
@@ -270,14 +268,12 @@ const PostApproval = () => {
         </div>
       </div>
 
-      {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
         </div>
       )}
 
-      {/* No posts state */}
       {!loading && posts.length === 0 && (
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
           <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -289,10 +285,95 @@ const PostApproval = () => {
         </div>
       )}
 
-      {/* Posts table - Only show when not loading and has posts */}
       {!loading && posts.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300">
-          <div className="overflow-x-auto">
+          <div className="block md:hidden">
+            <div className="space-y-4 p-4">
+              {posts.map((post) => (
+                <div key={post.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
+                      {post.image ? (
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                          <svg
+                            className="h-6 w-6 text-gray-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 truncate">{post.title}</h4>
+                      <p className="text-xs text-gray-500">{post.user?.name || 'Unknown'}</p>
+                      <p className="text-xs text-gray-500">{post.location}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {renderStars(post.rating)}
+                      <span className="text-xs text-gray-500">({post.rating})</span>
+                    </div>
+                    <span
+                      className={`px-2 py-1 text-xs leading-4 font-semibold rounded-full ${
+                        post.isApproved
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {post.isApproved ? 'Approved' : 'Pending'}
+                    </span>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500">
+                    {format(new Date(post.eatenAt), 'MMM d, yyyy')}
+                  </p>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => openPostDetail(post)}
+                      className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-blue-300 text-sm rounded-md text-blue-700 bg-white hover:bg-blue-50"
+                    >
+                      Detail
+                    </button>
+                    {!post.isApproved ? (
+                      <button
+                        onClick={() => handleApprovalToggle(post.id, post.isApproved)}
+                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-green-300 text-sm rounded-md text-green-700 bg-white hover:bg-green-50"
+                      >
+                        Approve
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleApprovalToggle(post.id, post.isApproved)}
+                        className="flex-1 inline-flex justify-center items-center px-3 py-2 border border-yellow-300 text-sm rounded-md text-yellow-700 bg-white hover:bg-yellow-50"
+                      >
+                        Hide
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -307,12 +388,6 @@ const PostApproval = () => {
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     User
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Location
                   </th>
                   <th
                     scope="col"
@@ -375,8 +450,8 @@ const PostApproval = () => {
                           <div className="text-sm font-medium text-gray-900">
                             {post.title}
                           </div>
-                          <div className="text-sm text-gray-500 line-clamp-1">
-                            {truncateText(post.review, 20)}
+                          <div className="text-sm text-gray-500 max-w-xs truncate">
+                            {post.location}
                           </div>
                         </div>
                       </div>
@@ -387,11 +462,6 @@ const PostApproval = () => {
                       </div>
                       <div className="text-sm text-gray-500">
                         {post.user?.email || 'No email'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {post.location}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -409,17 +479,17 @@ const PostApproval = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${post.isApproved
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                          }`}
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          post.isApproved
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
                       >
                         {post.isApproved ? 'Approved' : 'Pending'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex space-x-2 justify-end">
-                        {/* View Details button */}
                         <button
                           onClick={() => openPostDetail(post)}
                           className="inline-flex items-center px-3 py-1 border border-blue-300 text-sm rounded-md text-blue-700 bg-white hover:bg-blue-50"
@@ -427,7 +497,6 @@ const PostApproval = () => {
                           Detail
                         </button>
 
-                        {/* FIXED BUTTON LOGIC: Base on post.isApproved status, not filter */}
                         {!post.isApproved ? (
                           <button
                             onClick={() => handleApprovalToggle(post.id, post.isApproved)}
@@ -451,7 +520,6 @@ const PostApproval = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
@@ -477,9 +545,9 @@ const PostApproval = () => {
                   <p className="text-sm text-gray-700">
                     Showing <span className="font-medium">{(page - 1) * 10 + 1}</span> to{' '}
                     <span className="font-medium">
-                      {Math.min(page * 10, posts.length + (page - 1) * 10)}
+                      {Math.min(page * 10, totalPosts)}
                     </span>{' '}
-                    of <span className="font-medium">{posts.length}</span> results
+                    of <span className="font-medium">{totalPosts}</span> results
                   </p>
                 </div>
                 <div>
@@ -505,7 +573,6 @@ const PostApproval = () => {
                       </svg>
                     </button>
 
-                    {/* Show at most 5 pages for cleaner UI */}
                     {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
                       let pageNum;
                       if (totalPages <= 5) {
@@ -522,10 +589,11 @@ const PostApproval = () => {
                         <button
                           key={pageNum}
                           onClick={() => setPage(pageNum)}
-                          className={`relative inline-flex items-center px-4 py-2 border ${page === pageNum
-                            ? 'z-10 bg-green-50 border-green-500 text-green-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                            } text-sm font-medium`}
+                          className={`relative inline-flex items-center px-4 py-2 border ${
+                            page === pageNum
+                              ? 'z-10 bg-green-50 border-green-500 text-green-600'
+                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          } text-sm font-medium`}
                         >
                           {pageNum}
                         </button>
@@ -561,23 +629,22 @@ const PostApproval = () => {
           )}
         </div>
       )}
-      {/* Modal for post details - add at the end of the component */}
+
       {isModalOpen && selectedPost && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Background overlay */}
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={closePostDetail}></div>
 
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 max-h-[90vh] overflow-y-auto">
               <div className="absolute top-0 right-0 pt-4 pr-4">
                 <button
                   type="button"
                   className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none"
                   onClick={closePostDetail}
                 >
-                  <span className="sr-only">Đóng</span>
+                  <span className="sr-only">Close</span>
                   <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -590,46 +657,54 @@ const PostApproval = () => {
                     {selectedPost.title}
                   </h3>
 
-                  <div className="mt-4 border-t border-gray-200 pt-4">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">Poster:</span>
-                      <span className="text-sm text-gray-900">{selectedPost.user?.name}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">Location:</span>
-                      <span className="text-sm text-gray-900">{selectedPost.location}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">Rating:</span>
-                      <div className="flex items-center">
-                        {renderStars(selectedPost.rating)}
-                        <span className="ml-1 text-sm text-gray-900">({selectedPost.rating})</span>
+                  <div className="mt-4 border-t border-gray-200 pt-4 space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Poster:</span>
+                        <p className="text-sm text-gray-900">{selectedPost.user?.name || 'Unknown'}</p>
                       </div>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">Time:</span>
-                      <span className="text-sm text-gray-900">
-                        {format(new Date(selectedPost.eatenAt), 'dd/MM/yyyy')}
-                      </span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-500">Status:</span>
-                      <span className={`text-sm font-medium ${selectedPost.isApproved ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {selectedPost.isApproved ? 'Đã duyệt' : 'Chờ duyệt'}
-                      </span>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Email:</span>
+                        <p className="text-sm text-gray-900 break-words">{selectedPost.user?.email || 'No email'}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Location:</span>
+                        <p className="text-sm text-gray-900 break-words">{selectedPost.location}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Rating:</span>
+                        <div className="flex items-center">
+                          {renderStars(selectedPost.rating)}
+                          <span className="ml-1 text-sm text-gray-900">({selectedPost.rating})</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Date:</span>
+                        <p className="text-sm text-gray-900">
+                          {format(new Date(selectedPost.eatenAt), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Status:</span>
+                        <span className={`text-sm font-medium ${selectedPost.isApproved ? 'text-green-600' : 'text-yellow-600'}`}>
+                          {selectedPost.isApproved ? 'Approved' : 'Pending Approval'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Bài đánh giá:
-                    </label>
-                    <div className="border border-gray-300 rounded-md p-3 bg-gray-50 max-h-40 overflow-y-auto">
-                      <p className="text-sm text-gray-800 whitespace-pre-line">
-                        {selectedPost.review || "Không có đánh giá"}
-                      </p>
+                  {selectedPost.review && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Review:
+                      </label>
+                      <div className="border border-gray-300 rounded-md p-3 bg-gray-50 max-h-40 overflow-y-auto">
+                        <p className="text-sm text-gray-800 whitespace-pre-line">
+                          {selectedPost.review}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {selectedPost.image && (
                     <div className="mt-4">
@@ -648,17 +723,15 @@ const PostApproval = () => {
                 </div>
               </div>
 
-              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-2">
                 {!selectedPost.isApproved ? (
-                  <>
-                    <button
-                      type="button"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-                      onClick={handleApproveFromModal}
-                    >
-                      Approve
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    onClick={handleApproveFromModal}
+                  >
+                    Approve
+                  </button>
                 ) : (
                   <button
                     type="button"

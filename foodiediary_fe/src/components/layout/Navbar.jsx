@@ -83,7 +83,7 @@ const Navbar = () => {
                               <div className="text-gray-500 text-xs">{user.email}</div>
                             </div>
                           </Menu.Item>
-                          <Menu.Item>
+                          {/* <Menu.Item>
                             <Link
                               to="/my-posts"
                               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -108,7 +108,7 @@ const Navbar = () => {
                             >
                               My Bookmarks
                             </Link>
-                          </Menu.Item>
+                          </Menu.Item> */}
                           <Menu.Item>
                             <button
                               onClick={logout}
